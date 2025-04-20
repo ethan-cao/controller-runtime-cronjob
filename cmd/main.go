@@ -36,10 +36,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/metrics/filters"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+
+	batchv1 "tutorial.kubebuilder.io/controller-runtime-cronjob/api/v1"
+	"tutorial.kubebuilder.io/controller-runtime-cronjob/internal/controller"
 	// +kubebuilder:scaffold:imports
 )
 
 var (
+	// Scheme provides mappings between Kinds and their corresponding Go types.
 	scheme   = runtime.NewScheme()
 	setupLog = ctrl.Log.WithName("setup")
 )
@@ -47,6 +51,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
+	utilruntime.Must(batchv1.AddToScheme(scheme))
 	// +kubebuilder:scaffold:scheme
 }
 
@@ -198,6 +203,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	// add this reconciler to the manager, so that it gets started when the manager is started.
+	if err = (&controller.CronJobReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "CronJob")
+		os.Exit(1)
+	}
 	// +kubebuilder:scaffold:builder
 
 	if metricsCertWatcher != nil {
