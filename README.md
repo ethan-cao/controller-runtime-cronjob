@@ -10,4 +10,7 @@ kubebuilder init --domain tutorial.kubebuilder.io --repo tutorial.kubebuilder.io
 # create API
 kubebuilder create api --group batch --version v1 --kind CronJob
 
+# Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+make generate
+
 ```
