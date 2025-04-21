@@ -39,6 +39,7 @@ import (
 
 	batchv1 "tutorial.kubebuilder.io/controller-runtime-cronjob/api/v1"
 	"tutorial.kubebuilder.io/controller-runtime-cronjob/internal/controller"
+	webhookbatchv1 "tutorial.kubebuilder.io/controller-runtime-cronjob/internal/webhook/v1"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -49,8 +50,10 @@ var (
 )
 
 func init() {
+	// add the core Kubernetes API group’s package (clientgoscheme) to our scheme
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
+	// add the new API group’s package (batchv1) to our scheme
 	utilruntime.Must(batchv1.AddToScheme(scheme))
 	// +kubebuilder:scaffold:scheme
 }
@@ -210,6 +213,15 @@ func main() {
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "CronJob")
 		os.Exit(1)
+	}
+
+	// register the webhook for the CronJob resource
+	// nolint:goconst
+	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
+		if err = webhookbatchv1.SetupCronJobWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "CronJob")
+			os.Exit(1)
+		}
 	}
 	// +kubebuilder:scaffold:builder
 
