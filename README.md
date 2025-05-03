@@ -54,10 +54,21 @@ make docker-build
 
 # build and load image to Kind cluster
 kind load docker-image <your-image-name>:tag --name <your-kind-cluster-name>
- kind load docker-image controller:latest --name my-cluster
+kind load docker-image controller:latest --name my-cluster
 
-# add CRD to cluster
+# avoid pull image in config/manager/manager.yaml, since image is already loaded
+add-> imagePullPolicy: Never
+
+# install CRD in cluster
 kubectl apply -f config/crd/bases/batch.tutorial.kubebuilder.io_cronjobs.yaml
+
+# add permission
+kubectl apply -f config/rbac/
+
+# run controller-manager
+# this manager pod is not working, as certificates is not added
+# todo: follow https://book.kubebuilder.io/cronjob-tutorial/cert-manager
+kubectl apply -f config/manager/manager.yaml 
 
 ```
 
@@ -67,7 +78,6 @@ kubectl apply -f config/crd/bases/batch.tutorial.kubebuilder.io_cronjobs.yaml
 kubectl create -f config/samples/batch_v1_cronjob.yaml
 
 # check CR
-kubectl get cronjob.batch.tutorial.kubebuilder.io -o yaml
-kubectl get job
+kubectl get cronjob
 
 ```
