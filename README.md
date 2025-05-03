@@ -52,9 +52,12 @@ make run
 # build the image using the default container tool (Docker) with the tag specified in the IMG variable (default is controller:latest)
 make docker-build
 
-# load image to Kind cluster
+# build and load image to Kind cluster
 kind load docker-image <your-image-name>:tag --name <your-kind-cluster-name>
  kind load docker-image controller:latest --name my-cluster
+
+# add CRD to cluster
+kubectl apply -f config/crd/bases/batch.tutorial.kubebuilder.io_cronjobs.yaml
 
 ```
 
