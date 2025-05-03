@@ -182,6 +182,7 @@ func main() {
 		})
 	}
 
+	// create controller-runtime manager
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme:                 scheme,
 		Metrics:                metricsServerOptions,
