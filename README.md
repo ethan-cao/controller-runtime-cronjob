@@ -46,8 +46,15 @@ make install
 
 export ENABLE_WEBHOOKS=false
 
-# start controller locally, not in cluster
+# start controller in cluster, without image
 make run
+
+# build the image using the default container tool (Docker) with the tag specified in the IMG variable (default is controller:latest)
+make docker-build
+
+# load image to Kind cluster
+kind load docker-image <your-image-name>:tag --name <your-kind-cluster-name>
+ kind load docker-image controller:latest --name my-cluster
 
 ```
 
@@ -59,9 +66,5 @@ kubectl create -f config/samples/batch_v1_cronjob.yaml
 # check CR
 kubectl get cronjob.batch.tutorial.kubebuilder.io -o yaml
 kubectl get job
-
-
-# load image to Kind cluster
-kind load docker-image <your-image-name>:tag --name <your-kind-cluster-name>
 
 ```
